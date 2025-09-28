@@ -137,7 +137,7 @@ export const pay = async (amount, address1, address2, remark) => {
 			}
 			await tx.wait()
 			closeToast()
-			return tx
+			Promise.resolve(tx)
 		} catch (error) {
 			showToast('支付失败')
 			Promise.reject(error)
