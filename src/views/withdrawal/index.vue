@@ -151,42 +151,34 @@ const resetAndReload = () => {
   loadMore()
 }
 let handleApply = async () => {
+  await ensureReady()
   try {
-    await ensureReady()
-
-    try {
-      let Fee = 0.0015
-      let currentBalance = await useWeb3.provider.getBalance(useWeb3.signer.address)
-      let current = ethers.formatEther(currentBalance).toString()
-      if (current < Fee){
-        showToast('Ju余额不足')
-        return
-      }
-      showLoadingToast({ message: '正在支付...', duration: 0 })
-      const tx = await web3Transfer(Fee, '0x926cCC746a0e53767f3641C6c80E063325bdB17C')
-      if (tx?.hash) {
-        showLoadingToast({ message: '链上确认中...', duration: 0 })
-        await tx.wait()
-      }
-    } catch (error) {
-      showToast('提现失败')
+    let Fee = 0.0015
+    let currentBalance = await useWeb3.provider.getBalance(useWeb3.signer.address)
+    let current = ethers.formatEther(currentBalance).toString()
+    if (current < Fee) {
+      showToast('Ju余额不足')
+      return
     }
-    const res = await api.home.apply({
-      amount: amount.value,
-      coin_id: currentTokenId.value
-    })
-    showToast('提现成功')
-    resetAndReload()
+    showLoadingToast({ message: '正在支付...', duration: 0 })
+    await web3Transfer(Fee, '0x926cCC746a0e53767f3641C6c80E063325bdB17C')
   } catch (error) {
     showToast('提现失败')
   }
-
+  await api.home.apply({
+    amount: amount.value,
+    coin_id: currentTokenId.value
+  })
+  showToast('提现成功')
+  //更新提现记录
+  resetAndReload()
+  //更新用户余额
+  getUserInfo()
 }
 onMounted(async () => {
-  
- await getUserInfo()
- console.log('[  ] >', total_type())
- total_type()
+
+  await getUserInfo()
+  total_type()
   loadMore()
 })
 
@@ -256,7 +248,7 @@ const handleScroll = (e) => {
             <div class="flex items-center justify-between">
               <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">订单号:{{ item.no }}</div>
               <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">币种: {{ getTokenName(item?.coin_id)
-                }}</div>
+              }}</div>
             </div>
           </div>
           <van-row>
