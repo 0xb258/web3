@@ -25,7 +25,7 @@ const exchangeForm = ref({
 // 可选的源币种
 const fromCurrencies = ref([
     { label: 'XJ', value: 'XJ', key: 'x_s_balance' },
-    { label: 'XD', value: 'XD', key: 'x_d_balance' }
+    // { label: 'XD', value: 'XD', key: 'x_d_balance' }
 ])
 
 // 计算可用余额
