@@ -141,9 +141,7 @@ const handleClick = async () => {
 			coin_id: currentTokenId.value
 		})
 	} catch (e) {
-		setTimeout(() => {
-			showToast(e.message)
-		}, 100)
+		showToast(e.message)
 	}
 	amount.value = ''
 	try {
@@ -233,7 +231,7 @@ const changeTab = (item) => {
 				</div>
 				<div class="flex items-center justify-between text-[#7A7777] text-[10px] font-pingfang mt-[10px]">
 					<!-- <div>汇率:1JU={{ Number(order?.price).toFixed(2) || '-' }}USDT</div> -->
-					<div>当前可用 {{ getTokenName(selectIndex) }}：{{ Number(tokens?.[total_type()]||0.00).toFixed(3) }}</div>
+					<div>当前可用 {{ getTokenName(selectIndex) }}：{{ Number(tokens?.[total_type()] || 0.00).toFixed(3) }}</div>
 				</div>
 			</div>
 			<div class="body_content px-15 mt-[16px]">

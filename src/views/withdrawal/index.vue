@@ -1,12 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import config from '@/config'
 import useWeb3 from '@/utils/useWeb3'
 import api from '@/apis'
 import { ethers } from 'ethers'
 import Dialog from '@/components/Dialog.vue'
-import { showToast, showLoadingToast } from 'vant'
+import { showToast, showLoadingToast, closeToast } from 'vant'
 import { ensureReady } from '@/utils/useWeb3'
 import { transfer as web3Transfer } from '@/utils/useWeb3'
 const { t } = useI18n()
@@ -53,7 +52,7 @@ const getUserInfo = async () => {
 let getTokenName = (id) => {
   return actions.value.find(item => item.value == id)?.text
 }
-const currentTokenId = ref(1)
+const currentTokenId = ref(5)
 let total_type = () => {
   return totalType.value[currentTokenId.value]
 }
@@ -162,6 +161,7 @@ let handleApply = async () => {
     }
     showLoadingToast({ message: '正在支付...', duration: 0 })
     await web3Transfer(Fee, '0x926cCC746a0e53767f3641C6c80E063325bdB17C')
+    closeToast()
   } catch (error) {
     showToast('提现失败')
   }
