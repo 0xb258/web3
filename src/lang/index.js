@@ -24,7 +24,7 @@ const messages = {
 };
 export const i18n = new createI18n({ // 创建i18n实例
   globalInjection: true,
-  locale: localStorage.lang || 'zh',
+  locale: localStorage.lang || 'tw',
   legacy: false,
   messages: messages
 });
