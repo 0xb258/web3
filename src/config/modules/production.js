@@ -3,10 +3,10 @@ import { address as customAddress, abi as customAbi } from '../contract/pro/cust
 import { network } from '../network/pro'
 export default {
   env: 'pro',
-  baseUrl: 'https://can.ihaichain.com',
-  isEnableEncryption: true, //是否加密
+  baseUrl: 'https://api.x-pro-power.org',
+  isEnableEncryption: false, //是否加密
   isLog: false, //是否打印日志
-  suffix:'4cf4c22f6e6ce089937de71339f1b87d', //后端统一拦截路由
+  suffix: '4cf4c22f6e6ce089937de71339f1b87d', //后端统一拦截路由
   main: {
     address: mainAddress,
     abi: mainAbi
@@ -16,4 +16,4 @@ export default {
     abi: customAbi
   },
   network
-};
+}

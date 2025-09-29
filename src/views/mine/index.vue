@@ -10,11 +10,12 @@ const { t } = useI18n()
 let show = ref(false)
 let userInfo = ref({})
 let tokens = ref({
-	ju_balance: 0.00,
-	usdt_balance: 0.00,
-	x_s_balance: 0.00,
-	x_d_balance: 0.00,
-	report_balance: 0.00,
+	ju_balance: 0.0,
+	usdt_balance: 0.0,
+	x_s_balance: 0.0,
+	x_d_balance: 0.0,
+	xb_balance: 0.0,
+	report_balance: 0.0
 })
 const getUserInfo = async () => {
 	const res = await api.home.userInfo()
@@ -24,18 +25,18 @@ const getUserInfo = async () => {
 let invitationCode = ref('')
 
 const validateUid = (value) => {
-  let cleaned = value.replace(/[^0-9]/g, '')
-  if (cleaned.length > 1 && cleaned.startsWith('0')) {
-    cleaned = cleaned.replace(/^0+/, '')
-  }
-  return cleaned
+	let cleaned = value.replace(/[^0-9]/g, '')
+	if (cleaned.length > 1 && cleaned.startsWith('0')) {
+		cleaned = cleaned.replace(/^0+/, '')
+	}
+	return cleaned
 }
 
 const handleUidInput = (event) => {
-  const inputValue = event.target.value
-  const validatedValue = validateUid(inputValue)
-  event.target.value = validatedValue
-  invitationCode.value = validatedValue
+	const inputValue = event.target.value
+	const validatedValue = validateUid(inputValue)
+	event.target.value = validatedValue
+	invitationCode.value = validatedValue
 }
 
 onMounted(() => {
@@ -48,7 +49,7 @@ let handleConfirmCode = async () => {
 		showToast('请输入有效的UID')
 		return
 	}
-	
+
 	try {
 		await api.home.updateJuUid({
 			ju_uid: invitationCode.value
@@ -61,14 +62,7 @@ let handleConfirmCode = async () => {
 		show.value = false
 		invitationCode.value = ''
 	}
-	
-
 }
-
-
-
-
-
 
 // const dialogRef = ref(null)
 const isWithdraw = ref(false)
@@ -93,6 +87,10 @@ const toWithdrawal = () => {
 }
 let toInvitation = () => {
 	router.push('/invitation')
+}
+
+let toExchange = () => {
+	router.push('/exchange')
 }
 // const onSelect = () => {
 
@@ -158,7 +156,9 @@ const fallbackCopyText = (text) => {
 	<van-popup v-model:show="show" position="bottom" round closeable @close="() => { }" safe-area-inset-bottom>
 		<div class="pt-[18px] pb-[20px] px-10px">
 			<div class="flex">
-				<div class="mb-20 text-[14px] font-pingfang font-700" v-if="!!userInfo?.ju_uid">UID:{{ userInfo?.ju_uid }}</div>
+				<div class="mb-20 text-[14px] font-pingfang font-700" v-if="!!userInfo?.ju_uid">
+					UID:{{ userInfo?.ju_uid }}
+				</div>
 				<div class="mb-20 text-[14px] font-pingfang font-700" v-else>添加UID</div>
 				<div class="text-[#ccc] ml-[10px]" v-if="!!userInfo?.ju_uid" @click="copyContent(userInfo?.ju_uid)">
 					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="14" viewBox="0 0 15 14" fill="none">
@@ -175,25 +175,28 @@ const fallbackCopyText = (text) => {
 			</div>
 			<div @click="handleConfirmCode" :class="invitationCode ? 'opacity-100' : 'opacity-50'"
 				class="van-haptics-feedback disabled:opacity-50 py-16 text-[16px] font-roboto bg-[#000] text-[#fff] rounded-[2px] flex items-center justify-center">
-				确定{{ !!userInfo?.ju_uid ? '修改' : '添加' }}</div>
+				确定{{ !!userInfo?.ju_uid ? '修改' : '添加' }}
+			</div>
 		</div>
 	</van-popup>
 	<div class="container">
 		<div class="body">
-			<div class="body_top h-180 mb-20 px-16 pt-[26px] pb-[20px] text-[#fff]">
+			<div class="body_top h-244 mb-20 px-16 pt-[26px] pb-[20px] text-[#fff]">
 				<div class="flex items-center justify-between mb-20">
 					<div>
-						<div class="text-[28px] font-roboto font-700 mb-8">{{ Number(tokens?.totalAsset || 0).toFixed(2) }}</div>
+						<div class="text-[28px] font-roboto font-700 mb-8">
+							{{ Number(tokens?.totalAsset || 0).toFixed(2) }}
+						</div>
 						<div class="text-[12px] font-pingfang">资产总额（$）</div>
 					</div>
 					<div class="bg-[#FFFFFF1A] rounded-[88px] py-10 px-16 text-[12px] font-pingfang van-haptics-feedback"
-						@click="show = true">查看UID
+						@click="show = true">
+						查看UID
 					</div>
 				</div>
 				<div class="flex items-center justify-between">
-					<div
-						class="font-roboto font-500 w-50% flex items-center justify-center rounded-[10px] h-52 bg-[#000000] van-haptics-feedback"
-						@click='() => toWithdrawal()'>
+					<div class="font-roboto font-500 w-50% flex items-center justify-center rounded-[10px] h-52 bg-[#000000] van-haptics-feedback"
+						@click="() => toWithdrawal()">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 							<g clip-path="url(#clip0_3_596)">
 								<path
@@ -211,9 +214,8 @@ const fallbackCopyText = (text) => {
 						</svg>
 						<div class="ml-10">提现</div>
 					</div>
-					<div
-						class="font-roboto font-500 w-50% flex items-center justify-center rounded-[10px] h-52 bg-[#00C18D] ml-10 van-haptics-feedback"
-						@click='() => handleWithdrawOrRecharge(false)'>
+					<div class="font-roboto font-500 w-50% flex items-center justify-center rounded-[10px] h-52 bg-[#00C18D] ml-10 van-haptics-feedback"
+						@click="() => handleWithdrawOrRecharge(false)">
 						<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
 							<g clip-path="url(#clip0_3_605)">
 								<path
@@ -232,12 +234,27 @@ const fallbackCopyText = (text) => {
 						<div class="ml-10">转账</div>
 					</div>
 				</div>
+				<!-- 兑换按钮 -->
+				<div class="px-8 mt-6 cursor-pointer">
+					<div 
+						@click="toExchange"
+						class="w-100% flex items-center justify-center py-16 rounded-[10px] bg-gradient-to-r from-[#00C18D] to-[#00A878] van-haptics-feedback shadow-md transform transition-all duration-200 active:scale-98"
+					>
+						<div class="flex items-center">
+							<span class="text-white text-[16px] font-pingfang font-600">兑换</span>
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" class="ml-6 opacity-80">
+								<path d="M5 3.5L8.5 7L5 10.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="body_content px-15">
 				<div class="flex items-center justify-between mb-12">
 					<div class="w-50% font-roboto py-10 px-16 rounded-[12px] bg-[#F2F6F6]" @click="toInvitation">
 						<div class="mb-6">
-							<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+							<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"
+								fill="none">
 								<path
 									d="M13 4.49957C13.3283 4.49957 13.6537 4.56435 13.957 4.69C14.2602 4.81562 14.5355 4.99997 14.7676 5.23199C14.9997 5.46417 15.1839 5.74018 15.3096 6.04352C15.4351 6.34667 15.5 6.67146 15.5 6.99957C15.5 7.32785 15.4352 7.6533 15.3096 7.9566C15.1839 8.25995 14.9997 8.53596 14.7676 8.76813C14.5355 9.00016 14.2602 9.18451 13.957 9.31012C13.8093 9.37132 13.6559 9.41695 13.5 9.44879V13.2525L17.1143 9.63824C16.9379 9.43516 16.7936 9.20585 16.6904 8.9566C16.5648 8.6533 16.5 8.32785 16.5 7.99957C16.5 7.67146 16.5649 7.34667 16.6904 7.04352C16.8161 6.74018 17.0003 6.46417 17.2324 6.23199C17.4645 5.99997 17.7398 5.81562 18.043 5.69C18.3463 5.56435 18.6717 5.49957 19 5.49957C19.3283 5.49957 19.6537 5.56435 19.957 5.69C20.2602 5.81562 20.5355 5.99997 20.7676 6.23199C20.9997 6.46417 21.1839 6.74018 21.3096 7.04352C21.4351 7.34667 21.5 7.67146 21.5 7.99957C21.5 8.32785 21.4352 8.6533 21.3096 8.9566C21.1839 9.25995 20.9997 9.53596 20.7676 9.76813C20.5355 10.0002 20.2602 10.1845 19.957 10.3101C19.6537 10.4358 19.3283 10.5005 19 10.5005C18.6717 10.5005 18.3463 10.4358 18.043 10.3101C17.9999 10.2923 17.9589 10.2698 17.917 10.2496L13.5 14.6666V17.4996H12.5V14.4752L8.20996 10.1851C8.12775 10.2306 8.04419 10.274 7.95703 10.3101C7.6537 10.4358 7.32833 10.5005 7 10.5005C6.67167 10.5005 6.3463 10.4358 6.04297 10.3101C5.7398 10.1845 5.46448 10.0002 5.23242 9.76813C5.00027 9.53596 4.81605 9.25995 4.69043 8.9566C4.56484 8.6533 4.49997 8.32785 4.5 7.99957C4.50003 7.67146 4.56491 7.34667 4.69043 7.04352C4.81605 6.74018 5.00027 6.46417 5.23242 6.23199C5.46448 5.99997 5.7398 5.81562 6.04297 5.69C6.3463 5.56435 6.67167 5.49957 7 5.49957C7.32833 5.49957 7.6537 5.56435 7.95703 5.69C8.2602 5.81562 8.53552 5.99997 8.76758 6.23199C8.99973 6.46417 9.18395 6.74018 9.30957 7.04352C9.43509 7.34667 9.49997 7.67146 9.5 7.99957C9.50003 8.32785 9.43516 8.6533 9.30957 8.9566C9.22379 9.16375 9.1087 9.35649 8.97168 9.53278L12.5 13.0611V9.44879C12.3441 9.41695 12.1907 9.37132 12.043 9.31012C11.7398 9.18451 11.4645 9.00016 11.2324 8.76813C11.0003 8.53596 10.8161 8.25995 10.6904 7.9566C10.5648 7.6533 10.5 7.32785 10.5 6.99957C10.5 6.67146 10.5649 6.34667 10.6904 6.04352C10.8161 5.74018 11.0003 5.46417 11.2324 5.23199C11.4645 4.99997 11.7398 4.81562 12.043 4.69C12.3463 4.56435 12.6717 4.49957 13 4.49957Z"
 									fill="black" />
@@ -246,14 +263,15 @@ const fallbackCopyText = (text) => {
 									fill="#00C18D" />
 							</svg>
 						</div>
-						<div class="text-[#000000] text-[16px] font-700 mb-6">{{ Number(userInfo?.total_performance || 0).toFixed(2)
-						}}
+						<div class="text-[#000000] text-[16px] font-700 mb-6">
+							{{ Number(userInfo?.total_performance || 0).toFixed(2) }}
 						</div>
 						<div class="text-[#808080] text-[10px]">我的业绩</div>
 					</div>
 					<div class="w-50% font-roboto py-10 px-16 rounded-[12px] bg-[#F2F6F6] ml-10" @click="openHash">
 						<div class="mb-6">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+								fill="none">
 								<path
 									d="M11.03 12.2C6.31 12.2 2.75 10.31 2.75 7.80002C2.75 5.29002 6.31 3.40002 11.03 3.40002C15.75 3.40002 19.31 5.29002 19.31 7.80002C19.31 10.31 15.75 12.2 11.03 12.2ZM11.03 5.41002C7.2 5.41002 4.75 6.83002 4.75 7.81002C4.75 8.79002 7.2 10.21 11.03 10.21C14.86 10.21 17.31 8.79002 17.31 7.81002C17.31 6.83002 14.87 5.41002 11.03 5.41002ZM11.03 17.06C7.32 17.06 4.14 15.84 3.12 14.02C3.00689 13.7907 2.98596 13.5267 3.0615 13.2824C3.13704 13.038 3.30332 12.8319 3.52614 12.7064C3.74897 12.5809 4.0114 12.5456 4.2595 12.6076C4.50759 12.6697 4.72249 12.8244 4.86 13.04C5.41 14.02 7.76 15.06 11.03 15.06C14.21 15.06 16.57 14.05 17.17 13.09C17.46 12.62 18.08 12.48 18.55 12.78C19.02 13.07 19.16 13.69 18.86 14.16C17.75 15.92 14.68 17.06 11.03 17.06ZM11.03 21.91C7.32 21.91 4.14 20.69 3.12 18.87C3.00689 18.6407 2.98596 18.3767 3.0615 18.1324C3.13704 17.888 3.30332 17.6819 3.52614 17.5564C3.74897 17.4309 4.0114 17.3956 4.2595 17.4576C4.50759 17.5197 4.72249 17.6744 4.86 17.89C5.41 18.87 7.76 19.91 11.03 19.91C14.21 19.91 16.57 18.9 17.17 17.94C17.46 17.47 18.08 17.33 18.55 17.63C19.02 17.92 19.16 18.54 18.86 19.01C17.75 20.77 14.68 21.91 11.03 21.91Z"
 									fill="black" />
@@ -262,7 +280,8 @@ const fallbackCopyText = (text) => {
 									fill="#00C18D" />
 							</svg>
 						</div>
-						<div class="text-[#000000] text-[16px] font-700 mb-6">{{ userInfo?.user_power?.total_power || '0.00' }}
+						<div class="text-[#000000] text-[16px] font-700 mb-6">
+							{{ userInfo?.user_power?.total_power || '0.00' }}
 						</div>
 						<div class="text-[#808080] text-[10px]">购买算力</div>
 					</div>
@@ -280,7 +299,8 @@ const fallbackCopyText = (text) => {
 					</div>
 				</div>
 				<div class="flex items-center flex-col gap-16">
-					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback" @click="openIncomeList(5)">
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(5)">
 						<div class="flex items-center">
 							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
 							<div class="">
@@ -289,10 +309,12 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 						<div class="flex items-center">
-							<div class="text-[#000] text-[16px] font-roboto font-800">{{ Number(tokens?.ju_balance||0.00).toFixed(2) }}
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.ju_balance || 0.0).toFixed(2) }}
 							</div>
 							<div class="ml-3">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
 									<g opacity="0.5">
 										<path
 											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
@@ -302,7 +324,8 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 					</div>
-					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback" @click="openIncomeList(4)">
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(4)">
 						<div class="flex items-center">
 							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
 							<div class="">
@@ -311,10 +334,12 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 						<div class="flex items-center">
-							<div class="text-[#000] text-[16px] font-roboto font-800">{{ Number(tokens?.usdt_balance ||
-								'0.00').toFixed(2) }}</div>
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.usdt_balance || '0.00').toFixed(2) }}
+							</div>
 							<div class="ml-3">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
 									<g opacity="0.5">
 										<path
 											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
@@ -324,7 +349,8 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 					</div>
-					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback" @click="openIncomeList(1)">
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(1)">
 						<div class="flex items-center">
 							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
 							<div class="">
@@ -333,10 +359,12 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 						<div class="flex items-center">
-							<div class="text-[#000] text-[16px] font-roboto font-800">{{ Number(tokens?.report_balance ||
-								'0.00').toFixed(2) }}</div>
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.report_balance || '0.00').toFixed(2) }}
+							</div>
 							<div class="ml-3">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
 									<g opacity="0.5">
 										<path
 											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
@@ -346,7 +374,8 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 					</div>
-					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback" @click="openIncomeList(2)">
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(2)">
 						<div class="flex items-center">
 							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
 							<div class="">
@@ -355,10 +384,12 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 						<div class="flex items-center">
-							<div class="text-[#000] text-[16px] font-roboto font-800">{{ Number(tokens?.x_s_balance ||
-								'0.00').toFixed(2) }}</div>
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.x_s_balance || '0.00').toFixed(2) }}
+							</div>
 							<div class="ml-3">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
 									<g opacity="0.5">
 										<path
 											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
@@ -368,7 +399,8 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 					</div>
-					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback" @click="openIncomeList(3)">
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(3)">
 						<div class="flex items-center">
 							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
 							<div class="">
@@ -377,10 +409,37 @@ const fallbackCopyText = (text) => {
 							</div>
 						</div>
 						<div class="flex items-center">
-							<div class="text-[#000] text-[16px] font-roboto font-800">{{ Number(tokens?.x_d_balance ||
-								'0.00').toFixed(2) }}</div>
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.x_d_balance || '0.00').toFixed(2) }}
+							</div>
 							<div class="ml-3">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
+									<g opacity="0.5">
+										<path
+											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
+											fill="#272636" />
+									</g>
+								</svg>
+							</div>
+						</div>
+					</div>
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(6)">
+						<div class="flex items-center">
+							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
+							<div class="">
+								<div class="mb-4 text-[#000] text-[16px] font-pingfang">XB</div>
+								<div class="text-[#000] text-[12px] font-pingfang opacity-50">XB余额</div>
+							</div>
+						</div>
+						<div class="flex items-center">
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.xb_balance || '0.00').toFixed(2) }}
+							</div>
+							<div class="ml-3">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
 									<g opacity="0.5">
 										<path
 											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
@@ -469,13 +528,10 @@ const fallbackCopyText = (text) => {
 	min-height: calc(100vh - var(--van-nav-bar-height) - 28px);
 
 	&_top {
-		background: linear-gradient(192deg, #191D1C 30.36%, #237D4E 90.99%);
+		background: linear-gradient(192deg, #191d1c 30.36%, #237d4e 90.99%);
 
-		&__content {}
 	}
 }
-
-
 
 .custom-indicator {
 	position: absolute;
@@ -487,6 +543,6 @@ const fallbackCopyText = (text) => {
 }
 
 .border-D9 {
-	border: 1px solid #D9D9D9;
+	border: 1px solid #d9d9d9;
 }
 </style>

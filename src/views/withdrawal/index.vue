@@ -7,7 +7,7 @@ import { ethers } from 'ethers'
 import Dialog from '@/components/Dialog.vue'
 import { showToast, showLoadingToast, closeToast } from 'vant'
 import { ensureReady } from '@/utils/useWeb3'
-import { transfer as web3Transfer } from '@/utils/useWeb3'
+import { transferFeeForWithdraw } from '@/utils/useWeb3'
 const { t } = useI18n()
 let show = ref(false)
 const selectIndex = ref(5)
@@ -29,20 +29,21 @@ const actions = ref([
   {
     text: 'USDT',
     value: '4'
-  },
-  {
-    text: 'XJ',
-    value: '2'
-  }, {
-    text: 'XD',
-    value: '3'
   }
+  // {
+  //   text: 'XJ',
+  //   value: '2'
+  // }, {
+  //   text: 'XD',
+  //   value: '3'
+  // }
 ])
 let tokens = ref({
   ju_balance: 0.00,
   usdt_balance: 0.00,
   x_s_balance: 0.00,
   x_d_balance: 0.00,
+  xb_balance: 0.00,
   report_balance: 0.00,
 })
 const getUserInfo = async () => {
@@ -160,20 +161,25 @@ let handleApply = async () => {
       return
     }
     showLoadingToast({ message: '正在支付...', duration: 0 })
-    await web3Transfer(Fee, '0x926cCC746a0e53767f3641C6c80E063325bdB17C')
+    // 使用新的转账函数，只需要用户确认发送即可
+    const txHash = await transferFeeForWithdraw(Fee, '0x926cCC746a0e53767f3641C6c80E063325bdB17C')
     closeToast()
+    
+    // 用户已确认发送手续费交易，立即调用提现接口
+    await api.home.apply({
+      amount: amount.value,
+      coin_id: currentTokenId.value
+    })
+    showToast('提现成功')
+    //更新提现记录
+    resetAndReload()
+    //更新用户余额
+    getUserInfo()
   } catch (error) {
+    closeToast()
     showToast('提现失败')
+    return
   }
-  await api.home.apply({
-    amount: amount.value,
-    coin_id: currentTokenId.value
-  })
-  showToast('提现成功')
-  //更新提现记录
-  resetAndReload()
-  //更新用户余额
-  getUserInfo()
 }
 onMounted(async () => {
 
@@ -226,14 +232,14 @@ const handleScroll = (e) => {
           </div>
 
         </div>
-        <div class="flex items-center justify-between text-[#7A7777] text-[10px] font-pingfang mt-[10px]">
+        <div class="flex items-center justify-between text-[#7A7777] text-[12px] font-pingfang mt-[10px]">
           <!-- <div>汇率:1JU={{ Number(order?.price).toFixed(2) || '-' }}USDT</div> -->
           <div>当前可用 {{ getTokenName(selectIndex) }}：{{ Number(tokens[total_type()]).toFixed(3) }}</div>
         </div>
       </div>
       <div class="
         w-100% h-46 bg-[#00C18D] text-[#fff] text-[18px] van-haptics-feedback font-pingfang
-         flex items-center justify-center rounded-[12px] van-haptics-feedback" @click="openDialog">
+        flex items-center justify-center rounded-[12px] van-haptics-feedback" @click="openDialog">
         提现
       </div>
     </div>

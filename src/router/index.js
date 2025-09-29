@@ -14,7 +14,7 @@ const routes = [
       auth: false,
       title: '首页',
       keepAlive: true,
-      headerTheme:'dark',
+      headerTheme: 'dark'
     }
   },
   {
@@ -25,7 +25,7 @@ const routes = [
       auth: false,
       title: '算力认购',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
   },
   {
@@ -36,7 +36,7 @@ const routes = [
       auth: false,
       title: '认购订单',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
   },
   {
@@ -47,7 +47,7 @@ const routes = [
       auth: false,
       title: '邀请好友',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
   },
   {
@@ -58,7 +58,7 @@ const routes = [
       auth: false,
       title: '我的资产',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
   },
   {
@@ -69,7 +69,7 @@ const routes = [
       auth: false,
       title: '排行榜',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
   },
   {
@@ -80,7 +80,29 @@ const routes = [
       auth: false,
       title: '转账',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
+    }
+  },
+  {
+    path: '/exchange',
+    name: 'exchange',
+    component: () => import('../views/exchange/index.vue'),
+    meta: {
+      auth: false,
+      title: '兑换',
+      keepAlive: true,
+      headerTheme: 'light'
+    }
+  },
+  {
+    path: '/exchangeList',
+    name: 'exchangeList',
+    component: () => import('../views/exchange/list.vue'),
+    meta: {
+      auth: false,
+      title: '兑换记录',
+      keepAlive: true,
+      headerTheme: 'light'
     }
   },
   {
@@ -91,9 +113,10 @@ const routes = [
       auth: false,
       title: '算力记录',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
-  },{
+  },
+  {
     path: '/withdrawal',
     name: 'withdrawal',
     component: () => import('../views/withdrawal/index.vue'),
@@ -101,9 +124,10 @@ const routes = [
       auth: false,
       title: '提现',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
-  },{
+  },
+  {
     path: '/incomeList',
     name: 'incomeList',
     component: () => import('../views/income/index.vue'),
@@ -111,7 +135,7 @@ const routes = [
       auth: false,
       title: '收益记录',
       keepAlive: true,
-      headerTheme:'light',
+      headerTheme: 'light'
     }
   }
 ]

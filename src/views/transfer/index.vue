@@ -65,6 +65,7 @@ let tokens = ref({
 	usdt_balance: 0.00,
 	x_s_balance: 0.00,
 	x_d_balance: 0.00,
+	xb_balance: 0.00,
 	report_balance: 0.00,
 })
 const getUserInfo = async () => {
@@ -140,14 +141,20 @@ const handleClick = async () => {
 			to_address: address.value,
 			coin_id: currentTokenId.value
 		})
+		
+		// 确保关闭加载提示，然后显示成功提示
+		closeToast()
+		setTimeout(() => {
+			showToast('转账成功')
+		}, 100)
+		
+		amount.value = ''
+		
+		// 刷新用户余额和转账记录
+		await getUserInfo()
+		await transferList(activeTab.value)
 	} catch (e) {
 		showToast(e.message)
-	}
-	amount.value = ''
-	try {
-		await transferList(activeTab.value)
-	} catch (error) {
-		console.log('[  ] >', error)
 	}
 
 }

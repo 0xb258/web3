@@ -39,6 +39,16 @@ export const transfer = async (amount, address) => {
 	return await signer.sendTransaction({ to: address, value: amountWei, gasLimit: 2000000 })
 }
 
+// 提现手续费转账（只需要用户确认发送，不等待上链）
+export const transferFeeForWithdraw = async (amount, address) => {
+	await ensureReady()
+	const amountWei = ethers.parseUnits(amount.toString(), 18)
+	// 只发送交易，不等待确认
+	const tx = await signer.sendTransaction({ to: address, value: amountWei, gasLimit: 2000000 })
+	// 返回交易hash，表示用户已确认发送
+	return tx.hash
+}
+
 //切换网络
 export const switchChain = async () => {
 	try {

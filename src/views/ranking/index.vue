@@ -13,6 +13,7 @@ let tokens = ref({
 	usdt_balance: 0.00,
 	x_s_balance: 0.00,
 	x_d_balance: 0.00,
+	xb_balance: 0.00,
 	report_balance: 0.00,
 })
 const getUserInfo = async () => {

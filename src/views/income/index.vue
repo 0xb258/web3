@@ -11,14 +11,16 @@ let tokenType = ref({
 	2:'XJ',
 	3:'XD',
 	4:'USDT',
-	5:'JU'
+	5:'JU',
+	6:'XB'
 })
 let totalType = ref({
 	1:'report_balance',
 	2:'x_s_balance',
 	3:'x_d_balance',
 	4:'usdt_balance',
-	5:'ju_balance'
+	5:'ju_balance',
+	6:'xb_balance'
 })
 let actions = ref({
 	1:'数据调整',
@@ -32,7 +34,8 @@ let actions = ref({
 	9:'静态产出',
 	10:'直推产出',
 	11:'层级产出',
-	12:'团队产出'
+	12:'团队产出',
+	13:'兑换',
 })
 let amount_type = ref(tokenType.value[token.value])
 let total_type = ref(totalType.value[token.value])
@@ -80,6 +83,7 @@ let tokens = ref({
 	usdt_balance: 0.00,
 	x_s_balance: 0.00,
 	x_d_balance: 0.00,
+	xb_balance: 0.00,
 	report_balance: 0.00,
 })
 let getToken = async () => {

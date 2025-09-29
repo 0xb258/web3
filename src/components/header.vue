@@ -2,6 +2,7 @@
 import { ref, watch, defineProps, defineEmits } from 'vue'
 import lang from './lang.vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useIndexStore } from '@/store'
 import avatar from '@/static/icon/public/avatar.png'
 import light from '@/static/icon/public/light.png'
@@ -14,6 +15,7 @@ defineProps({
   }
 })
 const { t } = useI18n()
+const router = useRouter()
 const store = useIndexStore()
 let langRef = ref(null)
 
@@ -73,10 +75,13 @@ watch(
     ]
   }
 )
+let toHome = () => {
+  router.push('/index')
+}
 </script>
 <template>
   <nav :style="{ backgroundColor: theme === 'dark' ? '#191D1C' : '#FFFFFF' }">
-    <div class="header_wallet">
+    <div class="header_wallet" @click="toHome">
       <van-image width="38" height="38" :src="avatar" />
     </div>
     <div class="header_right">
