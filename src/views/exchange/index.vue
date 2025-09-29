@@ -12,7 +12,8 @@ const { t } = useI18n()
 const userBalance = ref({
     x_s_balance: 0.0, // XJ余额
     x_d_balance: 0.0, // XD余额
-    xb_balance: 0.0 // XB余额 (目标币种)
+    xbj_balance: 0.0, // XBJ余额
+    xbd_balance: 0.0  // XBD余额
 })
 
 // 兑换表单数据
@@ -24,8 +25,8 @@ const exchangeForm = ref({
 
 // 可选的源币种
 const fromCurrencies = ref([
-    { label: 'XJ', value: 'XJ', key: 'x_s_balance' },
-    // { label: 'XD', value: 'XD', key: 'x_d_balance' }
+    { label: 'XJ', value: 'XJ', key: 'x_s_balance', targetCurrency: 'XBJ', targetKey: 'xbj_balance' },
+    { label: 'XD', value: 'XD', key: 'x_d_balance', targetCurrency: 'XBD', targetKey: 'xbd_balance' }
 ])
 
 // 计算可用余额
@@ -34,7 +35,13 @@ const availableBalance = computed(() => {
     return currency ? userBalance.value[currency.key] : 0
 })
 
-// 计算兑换后获得的XB数量
+// 计算目标币种信息
+const targetCurrency = computed(() => {
+    const currency = fromCurrencies.value.find((c) => c.value === exchangeForm.value.fromCurrency)
+    return currency || { targetCurrency: 'XBJ', targetKey: 'xbj_balance' }
+})
+
+// 计算兑换后获得的目标币种数量
 const exchangeAmount = computed(() => {
     const amount = parseInt(exchangeForm.value.amount) || 0
     return (amount * exchangeForm.value.exchangeRate).toFixed(2)
@@ -83,11 +90,12 @@ const handleAmountInput = (event) => {
 const getUserBalance = async () => {
     try {
         const res = await api.home.userInfo()
-        if (res && res.balance_list) {
+        if (res) {
             userBalance.value = {
                 x_s_balance: parseFloat(res.balance_list.x_s_balance || 0),
                 x_d_balance: parseFloat(res.balance_list.x_d_balance || 0),
-                xb_balance: parseFloat(res.balance_list.xb_balance || 0)
+                xbj_balance: parseFloat(res.balance_list.xbj_balance || 0),
+                xbd_balance: parseFloat(res.balance_list.xbd_balance || 0)
             }
         }
     } catch (error) {
@@ -111,15 +119,15 @@ const handleExchange = async () => {
     try {
         await showConfirmDialog({
             title: '确认兑换',
-            message: `确定将 ${exchangeForm.value.amount} ${exchangeForm.value.fromCurrency} 兑换为 ${exchangeAmount.value} XB 吗？`,
+            message: `确定将 ${exchangeForm.value.amount} ${exchangeForm.value.fromCurrency} 兑换为 ${exchangeAmount.value} ${targetCurrency.value.targetCurrency} 吗？`,
             confirmButtonText: '确认兑换',
             cancelButtonText: '取消'
         })
 
         // 调用兑换API
         const coinIdMap = {
-            'XJ': 2,
-            'XD': 3
+            'XJ': 2,  // XJ -> XBJ
+            'XD': 3   // XD -> XBD
         }
         
         const result = await api.exchange.doExchange({
@@ -129,8 +137,6 @@ const handleExchange = async () => {
 
         // 检查API返回结果 - axios拦截器已经处理了响应，成功时返回data字段
         // 如果到达这里说明请求成功（code=200），因为失败的请求会在拦截器中被reject
-        console.log('兑换成功', result)
-        
         // 确保关闭加载提示，然后显示成功提示
         closeToast()
         setTimeout(() => {
@@ -142,8 +148,9 @@ const handleExchange = async () => {
         // 刷新余额
         await getUserBalance()
     } catch (error) {
+        console.log('兑换失败', error)
         if (error !== 'cancel') {
-            showToast('兑换失败，请稍后重试')
+            showToast(error.message || '兑换失败，请稍后重试')
         }
     }
 }
@@ -187,7 +194,7 @@ onMounted(() => {
                 <div class="text-center mb-28">
                     <div class="card-title">币币兑换</div>
                     <div class="card-subtitle">
-                        支持 XJ、XD 兑换为 XB<br />
+                        支持 XJ 兑换为 XBJ、XD 兑换为 XBD<br />
                         兑换比例：1:1
                     </div>
                 </div>
@@ -261,9 +268,9 @@ onMounted(() => {
                     <div class="target-currency">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <div class="target-currency-name">XB</div>
+                                <div class="target-currency-name">{{ targetCurrency.targetCurrency }}</div>
                                 <div class="target-currency-balance">
-                                    余额: {{ userBalance.xb_balance.toFixed(2) }}
+                                    余额: {{ userBalance[targetCurrency.targetKey].toFixed(2) }}
                                 </div>
                             </div>
                             <div class="exchange-result">
@@ -299,7 +306,7 @@ onMounted(() => {
             <div class="info-card">
                 <div class="info-title">兑换说明</div>
                 <div class="info-content">
-                    <div class="info-item">• 支持 XJ、XD 兑换为 XB</div>
+                    <div class="info-item">• 支持 XJ 兑换为 XBJ、XD 兑换为 XBD</div>
                     <div class="info-item">• 兑换比例固定为 1:1</div>
                     <div class="info-item">• 兑换后无法逆向兑换</div>
                     <div class="info-item">• 兑换立即到账，请谨慎操作</div>

@@ -17,7 +17,9 @@ const pageSize = ref(10)
 // 币种映射
 const coinMap = {
     2: { name: 'XJ', color: '#00C18D' },
-    3: { name: 'XD', color: '#3B82F6' }
+    3: { name: 'XD', color: '#3B82F6' },
+    6: { name: 'XBJ', color: '#186480' },
+    7: { name: 'XBD', color: '#F59E0B' },
 }
 
 // 获取币种名称
@@ -134,7 +136,7 @@ onMounted(() => {
                                 </svg>
                             </div>
                             <div class="coin-badge target-coin">
-                                XB
+                                {{ getCoinName(item.to_coin_id) }}
                             </div>
                         </div>
                         <div class="record-time">
@@ -154,7 +156,7 @@ onMounted(() => {
                             <div class="exchange-result">
                                 <div class="result-label">获得</div>
                                 <div class="result-value">
-                                    {{ item.exchange_num }} XB
+                                    {{ item.exchange_num }} {{ getCoinName(item.to_coin_id) }}
                                 </div>
                             </div>
                         </div>

@@ -14,7 +14,8 @@ let tokens = ref({
 	usdt_balance: 0.0,
 	x_s_balance: 0.0,
 	x_d_balance: 0.0,
-	xb_balance: 0.0,
+	xbj_balance: 0.0,
+	xbd_balance: 0.0,
 	report_balance: 0.0
 })
 const getUserInfo = async () => {
@@ -429,13 +430,38 @@ const fallbackCopyText = (text) => {
 						<div class="flex items-center">
 							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
 							<div class="">
-								<div class="mb-4 text-[#000] text-[16px] font-pingfang">XB</div>
-								<div class="text-[#000] text-[12px] font-pingfang opacity-50">XB余额</div>
+								<div class="mb-4 text-[#000] text-[16px] font-pingfang">XBJ</div>
+								<div class="text-[#000] text-[12px] font-pingfang opacity-50">XBJ余额</div>
 							</div>
 						</div>
 						<div class="flex items-center">
 							<div class="text-[#000] text-[16px] font-roboto font-800">
-								{{ Number(tokens?.xb_balance || '0.00').toFixed(2) }}
+								{{ Number(tokens?.xbj_balance || '0.00').toFixed(2) }}
+							</div>
+							<div class="ml-3">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
+									fill="none">
+									<g opacity="0.5">
+										<path
+											d="M11.3077 8.8297C11.3153 8.81449 11.3286 8.80119 11.3343 8.78599C11.4673 8.50852 11.4236 8.16644 11.1879 7.94408L5.81724 2.86414C5.52457 2.58668 5.06275 2.59998 4.78529 2.89265C4.50782 3.18532 4.52112 3.64713 4.81379 3.9246L9.63337 8.48381L4.8328 13.1095C4.54203 13.3889 4.53442 13.8507 4.81379 14.1415C4.95633 14.2897 5.14827 14.3657 5.33832 14.3657C5.52076 14.3657 5.70321 14.2973 5.84384 14.1605L11.1651 9.03115C11.1746 9.02164 11.1784 9.00644 11.1898 8.99694C11.1974 8.98934 11.2051 8.98363 11.2146 8.97603C11.2583 8.93232 11.2792 8.87911 11.3077 8.8297Z"
+											fill="#272636" />
+									</g>
+								</svg>
+							</div>
+						</div>
+					</div>
+					<div class="flex items-center justify-between py-8 w-100% van-haptics-feedback"
+						@click="openIncomeList(7)">
+						<div class="flex items-center">
+							<!-- <van-image width="36px" height="36px" :src="JU" /> -->
+							<div class="">
+								<div class="mb-4 text-[#000] text-[16px] font-pingfang">XBD</div>
+								<div class="text-[#000] text-[12px] font-pingfang opacity-50">XBD余额</div>
+							</div>
+						</div>
+						<div class="flex items-center">
+							<div class="text-[#000] text-[16px] font-roboto font-800">
+								{{ Number(tokens?.xbd_balance || '0.00').toFixed(2) }}
 							</div>
 							<div class="ml-3">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17"
