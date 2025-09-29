@@ -9,7 +9,7 @@ export default (axios, config = {}) => {
     baseURL: baseConfig.baseUrl,
     timeout: 50000,
     headers: {
-      'Content-Type': 'application/json;charset=UTF-8',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
     retry: 0, // 接口请求错误时重试次数
     retryDelay: 1000 // 接口请求错误时，重试间隔

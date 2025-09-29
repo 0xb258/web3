@@ -46,8 +46,8 @@ const requestInterceptorId = request.interceptors.request.use(
 
       let handshake = guid()
       let timestamp = Date.now()
-      let sign = md5(`${signParam}${timestamp}${handshake}`)
       let signKey = JSON.stringify(signParam)
+      let sign = md5(`${signKey}${timestamp}${handshake}`)
 
       let encrypData = aesEncrypt(signKey, handshake)
       config.data = {
@@ -84,7 +84,7 @@ const responseInterceptorId = request.interceptors.response.use(
 
           if (baseConfig.isLog) {
             console.log('[ res ] >', res)
-          }ß
+          }
           // 如果code不为200，则显示错误信息
           if (res.code != 200) {
             showToast(res.message)
