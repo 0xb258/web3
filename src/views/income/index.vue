@@ -36,6 +36,7 @@ let actions = ref({
 	11:'层级产出',
 	12:'团队产出',
 	13:'兑换',
+	14:'算力产出',
 })
 let amount_type = ref(tokenType.value[token.value])
 let total_type = ref(totalType.value[token.value])
