@@ -93,6 +93,9 @@ let toInvitation = () => {
 let toExchange = () => {
 	router.push('/exchange')
 }
+let toReleaseXD = () => {
+	router.push('/releaseXD')
+}
 // const onSelect = () => {
 
 // }
@@ -182,7 +185,7 @@ const fallbackCopyText = (text) => {
 	</van-popup>
 	<div class="container">
 		<div class="body">
-			<div class="body_top h-244 mb-20 px-16 pt-[26px] pb-[20px] text-[#fff]">
+			<div class="body_top h-320 mb-20 px-16 pt-[26px] pb-[20px] text-[#fff]">
 				<div class="flex items-center justify-between mb-20">
 					<div>
 						<div class="text-[28px] font-roboto font-700 mb-8">
@@ -243,6 +246,19 @@ const fallbackCopyText = (text) => {
 					>
 						<div class="flex items-center">
 							<span class="text-white text-[16px] font-pingfang font-600">兑换</span>
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" class="ml-6 opacity-80">
+								<path d="M5 3.5L8.5 7L5 10.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</div>
+					</div>
+				</div>
+				<div class="px-8 mt-6 cursor-pointer">
+					<div 
+						@click="toReleaseXD"
+						class="w-100% flex items-center justify-center py-16 rounded-[10px] bg-gradient-to-r from-[#00C18D] to-[#00A878] van-haptics-feedback shadow-md transform transition-all duration-200 active:scale-98"
+					>
+						<div class="flex items-center">
+							<span class="text-white text-[16px] font-pingfang font-600">待释放XD</span>
 							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" class="ml-6 opacity-80">
 								<path d="M5 3.5L8.5 7L5 10.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg>

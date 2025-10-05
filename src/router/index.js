@@ -137,6 +137,17 @@ const routes = [
       keepAlive: true,
       headerTheme: 'light'
     }
+  },
+  {
+    path: '/releaseXD',
+    name: 'releaseXD',
+    component: () => import('../views/income/releaseXD.vue'),
+    meta: {
+      auth: false,
+      title: '待释放XD',
+      keepAlive: true,
+      headerTheme: 'light'
+    }
   }
 ]
 const modulesFiles = import.meta.glob('./modules/*.js', { eager: true })

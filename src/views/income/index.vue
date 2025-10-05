@@ -37,6 +37,8 @@ let actions = ref({
 	12:'团队产出',
 	13:'兑换',
 	14:'算力产出',
+	15:'XD释放'
+
 })
 let amount_type = ref(tokenType.value[token.value])
 let total_type = ref(totalType.value[token.value])
@@ -54,7 +56,7 @@ const loadMore = async () => {
     loading.value = true
     try {
         const res = await api.home.incomeList({
-            amount_type: token.value,
+            type: 15,
             page: page.value,
             page_size: pageSize.value
         })
