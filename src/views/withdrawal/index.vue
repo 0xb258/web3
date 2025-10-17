@@ -19,7 +19,8 @@ let totalType = ref({
   2: 'x_s_balance',
   3: 'x_d_balance',
   4: 'usdt_balance',
-  5: 'ju_balance'
+  5: 'ju_balance',
+  6: 'xbj_balance'
 })
 const actions = ref([
   {
@@ -29,6 +30,10 @@ const actions = ref([
   {
     text: 'USDT',
     value: '4'
+  },
+  {
+    text: 'XBJ',
+    value: '6'
   }
   // {
   //   text: 'XJ',
@@ -43,7 +48,8 @@ let tokens = ref({
   usdt_balance: 0.00,
   x_s_balance: 0.00,
   x_d_balance: 0.00,
-  xb_balance: 0.00,
+  xbj_balance: 0.00,
+  xbd_balance: 0.00,
   report_balance: 0.00,
 })
 const getUserInfo = async () => {
