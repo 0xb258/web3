@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useWeb3 from '@/utils/useWeb3'
 import api from '@/apis'
@@ -34,14 +34,14 @@ const actions = ref([
   {
     text: 'XBJ',
     value: '6'
+  },
+  {
+    text: 'XJ',
+    value: '2'
+  }, {
+    text: 'XD',
+    value: '3'
   }
-  // {
-  //   text: 'XJ',
-  //   value: '2'
-  // }, {
-  //   text: 'XD',
-  //   value: '3'
-  // }
 ])
 let tokens = ref({
   ju_balance: 0.00,
@@ -64,10 +64,18 @@ let total_type = () => {
   return totalType.value[currentTokenId.value]
 }
 
+// 根据币种类型动态生成 placeholder
+const amountPlaceholder = computed(() => {
+  const isIntegerOnly = currentTokenId.value == 2 || currentTokenId.value == 3
+  return isIntegerOnly ? '请输入整数' : '请输入提现金额'
+})
+
 
 const onSelect = (val) => {
   selectIndex.value = val.value
   currentTokenId.value = val.value
+  // 切换币种时清空输入框
+  amount.value = ''
 }
 const dialogRef = ref(null)
 let openDialog = () => {
@@ -88,34 +96,51 @@ let pageSize = ref(10)
 let loading = ref(false)
 let finished = ref(false)
 let amount = ref('')
+let activeTab = ref('power') // 'power' 或 'balance'
 
 // 驗證輸入只允許正數和小數
 const validateAmount = (value) => {
-  // 移除所有非數字和小數點的字符
-  let cleaned = value.replace(/[^0-9.]/g, '')
+  // XJ (2) 和 XD (3) 只允許整數
+  const isIntegerOnly = currentTokenId.value == 2 || currentTokenId.value == 3
+  
+  if (isIntegerOnly) {
+    // 只允許輸入整數
+    let cleaned = value.replace(/[^0-9]/g, '')
+    
+    // 確保不以多個0開頭
+    if (cleaned.length > 1 && cleaned.startsWith('0')) {
+      cleaned = cleaned.replace(/^0+/, '')
+    }
+    
+    return cleaned
+  } else {
+    // 其他币种允許小數
+    // 移除所有非數字和小數點的字符
+    let cleaned = value.replace(/[^0-9.]/g, '')
 
-  // 確保只有一個小數點
-  const parts = cleaned.split('.')
-  if (parts.length > 2) {
-    cleaned = parts[0] + '.' + parts.slice(1).join('')
+    // 確保只有一個小數點
+    const parts = cleaned.split('.')
+    if (parts.length > 2) {
+      cleaned = parts[0] + '.' + parts.slice(1).join('')
+    }
+
+    // 確保小數點後最多18位
+    if (parts.length === 2 && parts[1].length > 18) {
+      cleaned = parts[0] + '.' + parts[1].substring(0, 18)
+    }
+
+    // 確保不以小數點開頭
+    if (cleaned.startsWith('.')) {
+      cleaned = '0' + cleaned
+    }
+
+    // 確保不以多個0開頭（除了0.xxx的情況）
+    if (cleaned.match(/^0+[1-9]/)) {
+      cleaned = cleaned.replace(/^0+/, '')
+    }
+
+    return cleaned
   }
-
-  // 確保小數點後最多18位
-  if (parts.length === 2 && parts[1].length > 18) {
-    cleaned = parts[0] + '.' + parts[1].substring(0, 18)
-  }
-
-  // 確保不以小數點開頭
-  if (cleaned.startsWith('.')) {
-    cleaned = '0' + cleaned
-  }
-
-  // 確保不以多個0開頭（除了0.xxx的情況）
-  if (cleaned.match(/^0+[1-9]/)) {
-    cleaned = cleaned.replace(/^0+/, '')
-  }
-
-  return cleaned
 }
 
 const handleAmountInput = (event) => {
@@ -131,7 +156,9 @@ const loadMore = async () => {
   if (loading.value || finished.value) return
   loading.value = true
   try {
-    const res = await api.home.applyList({
+    // 根据当前 tab 选择不同的接口
+    const apiMethod = activeTab.value === 'power' ? api.home.powerList : api.home.applyList
+    const res = await apiMethod({
       page: page.value,
       page_size: pageSize.value,
     })
@@ -201,6 +228,13 @@ const handleScroll = (e) => {
   }
 }
 
+// 切换 Tab
+const handleTabChange = (tab) => {
+  if (activeTab.value === tab) return
+  activeTab.value = tab
+  resetAndReload()
+}
+
 </script>
 <template>
   <div class="container">
@@ -228,7 +262,7 @@ const handleScroll = (e) => {
         <div class="font-pingfang font-400 mb-8">提现数量</div>
         <div class="h-46 rounded-[8px] flex items-center justify-between px-10 border-c0">
           <div class="text-[14px] text-[#7A7777] font-pingfang numInput">
-            <input type="text" placeholder="请输入提现金额" v-model="amount" @input="handleAmountInput"
+            <input type="text" :placeholder="amountPlaceholder" v-model="amount" @input="handleAmountInput"
               class="border-none outline-none bg-[#F7F7F9]/0 w-100% text-[14px]" />
           </div>
           <div class="flex items-center ml-16">
@@ -250,53 +284,111 @@ const handleScroll = (e) => {
       </div>
     </div>
     <div class="mb-30">
-      <div class="flex items-center mb-18">
-        <div class="w-4 h-16 bg-[#00C960] rounded-full"></div>
-        <div class="text-[#000] text-[14px] font-pingfang ml-6">提现记录</div>
+      <div class="flex items-center justify-between mb-18">
+        <div class="flex items-center">
+          <div class="w-4 h-16 bg-[#00C960] rounded-full"></div>
+          <div class="text-[#000] text-[14px] font-pingfang ml-6">提现记录</div>
+        </div>
+        <!-- Tab 切换 -->
+        <div class="flex items-center bg-[#F2F6F6] rounded-[8px] p-4">
+          <div 
+            @click="handleTabChange('power')"
+            :class="[
+              'px-16 py-6 rounded-[6px] text-[12px] font-pingfang cursor-pointer transition-all van-haptics-feedback',
+              activeTab === 'power' ? 'bg-[#00C18D] text-white' : 'text-[#666]'
+            ]"
+          >
+            算力提现
+          </div>
+          <div 
+            @click="handleTabChange('balance')"
+            :class="[
+              'px-16 py-6 rounded-[6px] text-[12px] font-pingfang cursor-pointer transition-all van-haptics-feedback',
+              activeTab === 'balance' ? 'bg-[#00C18D] text-white' : 'text-[#666]'
+            ]"
+          >
+            余额提现
+          </div>
+        </div>
       </div>
       <div class="flex flex-col gap-10 scroll-box" @scroll.passive="handleScroll">
-        <div class="px-16 py-10 rounded-[6px] bg-[#F5F8F8]" v-for="item in list" :key="item.no">
-          <div class="row">
-            <div class="flex items-center justify-between">
-              <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">订单号:{{ item.no }}</div>
-              <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">币种: {{ getTokenName(item?.coin_id)
-              }}</div>
-            </div>
-          </div>
-          <van-row>
-            <van-col span="8" class="mt-[4px]">
-              <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">提现数量</div>
-              <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.num }} {{
-                getTokenName(item?.coin_id) }}</div>
-            </van-col>
-            <van-col span="8" class="mt-[4px]">
-              <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">手续费</div>
-              <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.fee }}</div>
-            </van-col>
-            <van-col span="8" class="mt-[4px]">
-              <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">实际到账</div>
-              <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.ac_amount }}</div>
-            </van-col>
-          </van-row>
-          <div class="row mt-[6px]">
-            <div class="flex items-center justify-between">
-              <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
-                时间：{{ item.created_at }}
+        <!-- 算力提现记录 -->
+        <template v-if="activeTab === 'power'">
+          <div class="px-16 py-10 rounded-[6px] bg-[#F5F8F8]" v-for="item in list" :key="item.order_no">
+            <div class="row">
+              <div class="flex items-center justify-between mb-[8px]">
+                <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">内部订单号</div>
+                <div class="text-[#000] text-[12px] font-roboto font-500">{{ item.order_no }}</div>
               </div>
-              <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
-                <van-tag type="warning" v-if="item.status == 1">待到账</van-tag>
-                <van-tag type="warning" v-if="item.status == 2">成功</van-tag>
-                <van-tag type="danger" v-if="item.status == 3">失败</van-tag>
+              <div class="flex items-center justify-between" v-if="item.out_trade_no">
+                <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">外部订单号</div>
+                <div class="text-[#000] text-[12px] font-roboto font-500">{{ item.out_trade_no }}</div>
               </div>
             </div>
+            <van-row class="mt-[8px]">
+              <van-col span="12" class="mt-[4px]">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">静态算力</div>
+                <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.static_power }}</div>
+              </van-col>
+              <van-col span="12" class="mt-[4px]">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">动态算力</div>
+                <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.dynamic_power }}</div>
+              </van-col>
+            </van-row>
+            <div class="row mt-[6px]">
+              <div class="flex items-center justify-between">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
+                  时间：{{ item.created_at }}
+                </div>
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
+                  <van-tag type="warning" v-if="item.status == 1">待同步</van-tag>
+                  <van-tag type="success" v-if="item.status == 2">同步成功</van-tag>
+                </div>
+              </div>
+            </div>
           </div>
-          <!-- <div class="mb-10 flex items-center">
-            <div class=" text-[#000] font-7000 text-[14px] font-roboto">{{ item.num }} {{ item.token }}</div>
-          </div> -->
-          <!-- <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
-            时间：{{ item.created_at }}
-          </div> -->
-        </div>
+        </template>
+
+        <!-- 余额提现记录 -->
+        <template v-else>
+          <div class="px-16 py-10 rounded-[6px] bg-[#F5F8F8]" v-for="item in list" :key="item.no">
+            <div class="row">
+              <div class="flex items-center justify-between">
+                <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">订单号:{{ item.no }}</div>
+                <div class="text-[#8F8F8F] text-[12px] font-roboto font-400">币种: {{ getTokenName(item?.coin_id)
+                }}</div>
+              </div>
+            </div>
+            <van-row>
+              <van-col span="8" class="mt-[4px]">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">提现数量</div>
+                <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.num }} {{
+                  getTokenName(item?.coin_id) }}</div>
+              </van-col>
+              <van-col span="8" class="mt-[4px]">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">手续费</div>
+                <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.fee }}</div>
+              </van-col>
+              <van-col span="8" class="mt-[4px]">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">实际到账</div>
+                <div class="text-[#000] font-7000 text-[14px] font-roboto mt-[2px]">{{ item.ac_amount }}</div>
+              </van-col>
+            </van-row>
+            <div class="row mt-[6px]">
+              <div class="flex items-center justify-between">
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
+                  时间：{{ item.created_at }}
+                </div>
+                <div class="text-[#8F8F8F] text-[10px] font-roboto font-400">
+                  <van-tag type="warning" v-if="item.status == 1">待到账</van-tag>
+                  <van-tag type="success" v-if="item.status == 2">成功</van-tag>
+                  <van-tag type="danger" v-if="item.status == 3">失败</van-tag>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
         <div class="py-12 text-center text-[#999] text-[12px]" v-if="loading">加载中...</div>
         <div class="py-12 text-center text-[#999] text-[12px]" v-else-if="finished && list.length">没有更多数据了</div>
       </div>
@@ -350,5 +442,9 @@ const handleScroll = (e) => {
   width: 0;
   height: 0;
   display: none;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

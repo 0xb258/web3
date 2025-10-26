@@ -11,6 +11,7 @@ export default {
   powerLog:{method:'get',url:'/api/v1/user/powerLog'}, //算力记录
   apply:{method:'post',url:'/api/v1/withdraw/apply'}, //提现
   applyList:{method:'get',url:'/api/v1/withdraw/list'}, //提现记录
+  powerList:{method:'get',url:'/api/v1/withdraw/powerList'}, //算力提现记录
   getPayOrder:{method:'post',url:'/api/v1/power/getOrder'}, //获取支付订单
   userInfo:{method:'get',url:'/api/v1/user/info'}, //用户信息
   zhiList:{method:'get',url:'/api/v1/user/zhiList'}, //直推列表
