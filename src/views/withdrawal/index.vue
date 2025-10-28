@@ -210,7 +210,7 @@ let handleApply = async () => {
     getUserInfo()
   } catch (error) {
     closeToast()
-    showToast('提现失败')
+    showToast(error)
     return
   }
 }
